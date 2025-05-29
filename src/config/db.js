@@ -15,10 +15,13 @@ pool.on('connect', () => {
 // Tratamento de erros de conexão
 pool.on('error', (err) => {
   console.error('Erro na conexão com o PostgreSQL:', err);
-  process.exit(-1);
+  // Em produção, não queremos que o servidor caia por erro de conexão
+  if (process.env.NODE_ENV !== 'production') {
+    process.exit(-1);
+  }
 });
 
 module.exports = {
   query: (text, params) => pool.query(text, params),
   pool
-}; 
+};
