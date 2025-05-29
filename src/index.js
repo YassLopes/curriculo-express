@@ -4,6 +4,9 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 require('dotenv').config();
 
+// Importação do inicializador de banco de dados
+const { initializeDb } = require('./db/initDb');
+
 // Importação das rotas
 const userRoutes = require('./routes/users');
 const educationRoutes = require('./routes/education');
@@ -49,7 +52,18 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Inicialização do servidor
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-}); 
+// Inicializar banco de dados e depois iniciar servidor
+(async () => {
+  try {
+    // Inicializa o banco de dados
+    await initializeDb();
+    
+    // Inicialização do servidor
+    app.listen(PORT, () => {
+      console.log(`Servidor rodando na porta ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Erro ao iniciar aplicação:', error);
+    process.exit(1);
+  }
+})(); 
